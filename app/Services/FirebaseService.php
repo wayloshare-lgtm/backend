@@ -11,14 +11,21 @@ class FirebaseService
     private FirebaseAuth $auth;
 
     public function __construct()
-    {
-        try {
-            $factory = (new Factory)->withServiceAccount(config('firebase.credentials.file'));
-            $this->auth = $factory->createAuth();
-        } catch (Exception $e) {
-            throw new Exception('Firebase initialization failed: ' . $e->getMessage());
+{
+    try {
+        $credentialsPath = storage_path('firebase/firebase_credentials.json');
+
+        if (!file_exists($credentialsPath)) {
+            throw new Exception("Firebase credentials file not found at: " . $credentialsPath);
         }
+
+        $factory = (new Factory)->withServiceAccount($credentialsPath);
+        $this->auth = $factory->createAuth();
+
+    } catch (Exception $e) {
+        throw new Exception('Firebase initialization failed: ' . $e->getMessage());
     }
+}
 
     /**
      * Verify Firebase ID token

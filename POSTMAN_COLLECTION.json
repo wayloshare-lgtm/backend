@@ -1,0 +1,608 @@
+{
+  "info": {
+    "name": "WayloShare Backend API",
+    "description": "Complete API testing collection for WayloShare ride-sharing backend with automatic token extraction",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/health",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "health"]
+            },
+            "description": "Check backend health - DB, Redis, Queue connections"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('sanctum_token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.user.id);",
+                  "    console.log('✓ Token saved: ' + jsonData.token);",
+                  "    console.log('✓ User ID saved: ' + jsonData.user.id);",
+                  "} else {",
+                  "    console.log('✗ Login failed');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login with Firebase token - returns Sanctum API token. Token is automatically saved to environment."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/me",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "me"]
+            },
+            "description": "Get current user profile"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Rides",
+      "item": [
+        {
+          "name": "POST /rides (Request Ride)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200 || pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('ride_id', jsonData.ride.id);",
+                  "    console.log('✓ Ride ID saved: ' + jsonData.ride.id);",
+                  "} else {",
+                  "    console.log('✗ Ride creation failed');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pickup_location\": \"123 Main St, Downtown\",\n  \"pickup_lat\": 32.7266,\n  \"pickup_lng\": 74.8570,\n  \"dropoff_location\": \"456 Oak Ave, Uptown\",\n  \"dropoff_lat\": 32.7100,\n  \"dropoff_lng\": 74.8500,\n  \"estimated_distance_km\": 12,\n  \"estimated_duration_minutes\": 20\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides"]
+            },
+            "description": "Request a new ride. Ride ID is automatically saved to environment."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /rides/{ride_id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides/{{ride_id}}",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides", "{{ride_id}}"]
+            },
+            "description": "Get ride details by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rides/{ride_id}/accept",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides/{{ride_id}}/accept",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides", "{{ride_id}}", "accept"]
+            },
+            "description": "Driver accepts a ride (requires driver role)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rides/{ride_id}/arrive",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides/{{ride_id}}/arrive",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides", "{{ride_id}}", "arrive"]
+            },
+            "description": "Driver arrives at pickup location"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rides/{ride_id}/start",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides/{{ride_id}}/start",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides", "{{ride_id}}", "start"]
+            },
+            "description": "Driver starts the ride"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /rides/{ride_id}/complete",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actual_distance_km\": 12.5,\n  \"actual_duration_minutes\": 22\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/rides/{{ride_id}}/complete",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "rides", "{{ride_id}}", "complete"]
+            },
+            "description": "Driver completes the ride"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Driver Profile",
+      "item": [
+        {
+          "name": "POST /driver/profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"license_number\": \"DL123456789\",\n  \"vehicle_type\": \"sedan\",\n  \"vehicle_number\": \"ABC-1234\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/driver/profile",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "driver", "profile"]
+            },
+            "description": "Create or update driver profile"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /driver/profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/driver/profile",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "driver", "profile"]
+            },
+            "description": "Get driver profile (requires driver role)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /driver/location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 32.7266,\n  \"longitude\": 74.8570\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/driver/location",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "driver", "location"]
+            },
+            "description": "Update driver current location"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /driver/toggle-online",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/driver/toggle-online",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "driver", "toggle-online"]
+            },
+            "description": "Toggle driver online/offline status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Fare",
+      "item": [
+        {
+          "name": "POST /admin/fare",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"base_fare\": 50,\n  \"per_km_rate\": 15,\n  \"per_minute_rate\": 2,\n  \"fuel_surcharge_per_km\": 1.5,\n  \"platform_fee_percentage\": 10,\n  \"toll_enabled\": true,\n  \"night_multiplier\": 1.5,\n  \"surge_multiplier\": 1.2,\n  \"city\": \"Islamabad\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/admin/fare",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "admin", "fare"]
+            },
+            "description": "Create or update fare configuration (requires admin role)"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /admin/fare",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/admin/fare",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "admin", "fare"]
+            },
+            "description": "Get active fare configuration (requires admin role)"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /admin/fare/calculate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"distance_km\": 12,\n  \"duration_minutes\": 20,\n  \"toll_amount\": 100\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/admin/fare/calculate",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "admin", "fare", "calculate"]
+            },
+            "description": "Calculate fare estimate (requires admin role)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Cleanup (Logout)",
+      "item": [
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/v1/auth/logout",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "v1", "auth", "logout"]
+            },
+            "description": "Logout and revoke all tokens (run at the end)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "firebase_token",
+      "value": "eyJhbGciOiJSUzI1NiIsImtpZCI6IjJjMjdhZmY1YzlkNGU1MzVkNWRjMmMwNWM1YTE2N2FlMmY1NjgxYzIiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vd2F5bG9zaGFyZS1hZTdjOSIsImF1ZCI6IndheWxvc2hhcmUtYWU3YzkiLCJhdXRoX3RpbWUiOjE3NzI0NDcxMTMsInVzZXJfaWQiOiI0czVNSDRSMmNkY2R3Z0ttNEoyTmU3Rm93WlcyIiwic3ViIjoiNHM1TUg0UjJjZGNkd2dLbTRKMk5lN0Zvd1pXMiIsImlhdCI6MTc3MjQ0NzExMywiZXhwIjoxNzcyNDUwNzEzLCJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsImZpcmViYXNlIjp7ImlkZW50aXRpZXMiOnsiZW1haWwiOlsidGVzdEB0ZXN0LmNvbSJdfSwic2lnbl9pbl9wcm92aWRlciI6InBhc3N3b3JkIn19.R4tW0KtarpMlC7t7L11HtS9roT9ptVmFzRvTaT1RmU6TzNdsly1ayMopjZ1WNAJ2G7OA1YqdX2f-oaH9eY00q0g_J2lUFzVGxfMXZaaPKPJKJ_BxF_KB9eNiY9DckUqUcraeVbjDjDVhAhzwzmrNNo5Neyws9wOhSvx41ZrZMuUpYL_HdXa3c2dHH90RIjgtXkCK4CuobHWlyACrzCHlkKhJtjMeRK01ic-6ZX9nzIgW-L-zzYy49yyrpE0qtl9K6lv9vo8v9MQtIsuVCh-l9DqVTLi3bGW1Ko-a7sZu94XvRCq9mis9g4DIkT5ZtQIm4XqUWVExwzlTUTeqreuSqw",
+      "type": "string"
+    },
+    {
+      "key": "sanctum_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ride_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
