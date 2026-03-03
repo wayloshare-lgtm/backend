@@ -11,6 +11,20 @@ Route::prefix('v1')->group(function () {
     // Public health check (no auth required)
     Route::get('/health', [HealthCheckController::class, 'check']);
 
+    // Debug endpoint to check request headers
+    Route::get('/debug/headers', function (\Illuminate\Http\Request $request) {
+        return response()->json([
+            'headers' => [
+                'Authorization' => $request->header('Authorization'),
+                'Bearer Token' => $request->bearerToken(),
+                'Accept' => $request->header('Accept'),
+                'Content-Type' => $request->header('Content-Type'),
+            ],
+            'auth_user' => auth()->user(),
+            'sanctum_user' => auth('sanctum')->user(),
+        ]);
+    });
+
     // Public auth routes
     Route::post('/auth/login', [AuthController::class, 'login']);
 
