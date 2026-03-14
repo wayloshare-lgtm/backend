@@ -1,0 +1,16 @@
+{
+  "specName": "flutter-backend-alignment",
+  "specType": "feature",
+  "workflowType": "requirements-first",
+  "displayName": "Flutter Backend Alignment",
+  "description": "Align WayloShare backend with Flutter app requirements by implementing 100+ missing data fields across 13 new database tables and 40+ new API endpoints",
+  "createdAt": "2026-03-14",
+  "status": "in_progress",
+  "phases": 15,
+  "totalTasks": 150,
+  "completedTasks": 0,
+  "priority": "high",
+  "estimatedDuration": "4-6 weeks",
+  "team": ["developer"],
+  "tags": ["flutter", "backend", "api", "database", "integration"]
+}
