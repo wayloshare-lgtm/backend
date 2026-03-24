@@ -69,4 +69,20 @@ class Ride extends Model
     {
         return $this->belongsTo(User::class, 'driver_id');
     }
+
+    /**
+     * Get the bookings for this ride
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
+     * Get the location history for this ride
+     */
+    public function locations()
+    {
+        return $this->hasMany(RideLocation::class);
+    }
 }

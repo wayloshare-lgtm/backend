@@ -21,14 +21,38 @@ class UserProfileService
                 'id' => $user->id,
                 'firebase_uid' => $user->firebase_uid,
                 'name' => $user->name,
+                'display_name' => $user->display_name,
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'role' => $user->role,
                 'is_active' => $user->is_active,
                 'is_verified' => $user->is_verified,
+                'gender' => $user->gender,
+                'bio' => $user->bio,
+                'profile_photo_url' => $user->profile_photo_url,
+                'user_preference' => $user->user_preference,
+                'date_of_birth' => $user->date_of_birth,
+                'onboarding_completed' => $user->onboarding_completed,
+                'profile_completed' => $user->profile_completed,
+                'profile_visibility' => $user->profile_visibility,
+                'show_phone' => $user->show_phone,
+                'show_email' => $user->show_email,
+                'allow_messages' => $user->allow_messages,
+                'language' => $user->language,
+                'theme' => $user->theme,
                 'created_at' => $user->created_at,
             ];
         });
+    }
+
+    /**
+     * Update user profile
+     */
+    public function updateProfile(User $user, array $data): User
+    {
+        $user->update($data);
+        $this->invalidateCache($user->id);
+        return $user;
     }
 
     /**

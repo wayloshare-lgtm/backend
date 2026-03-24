@@ -24,21 +24,23 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'firebase_uid' => fake()->unique()->uuid(),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'phone' => fake()->unique()->phoneNumber(),
+            'role' => 'rider',
+            'is_active' => true,
+            'is_verified' => false,
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the model should be a driver.
      */
-    public function unverified(): static
+    public function driver(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'role' => 'driver',
         ]);
     }
 }

@@ -1,133 +1,133 @@
 # WayloShare Flutter Backend Alignment - Task List
 
 ## Phase 1: User Profile Enhancement (13 fields)
-- [~] 1.1 Add display_name field to users table
-- [ ] 1.2 Add date_of_birth field to users table
-- [ ] 1.3 Add gender field to users table (enum: male, female, other)
-- [ ] 1.4 Add bio field to users table (max 500 chars)
-- [ ] 1.5 Add profile_photo_url field to users table
-- [ ] 1.6 Add user_preference field to users table (enum: driver, passenger, both)
-- [ ] 1.7 Add onboarding_completed field to users table
-- [ ] 1.8 Add profile_completed field to users table
-- [ ] 1.9 Create migration for user profile fields
-- [ ] 1.10 Update User model with new fields
-- [ ] 1.11 Create UserProfileController with update endpoints
-- [ ] 1.12 Add profile photo upload endpoint
-- [ ] 1.13 Add profile completion endpoint
+- [x] 1.1 Add display_name field to users table
+- [x] 1.2 Add date_of_birth field to users table
+- [x] 1.3 Add gender field to users table (enum: male, female, other)
+- [x] 1.4 Add bio field to users table (max 500 chars)
+- [x] 1.5 Add profile_photo_url field to users table
+- [x] 1.6 Add user_preference field to users table (enum: driver, passenger, both)
+- [x] 1.7 Add onboarding_completed field to users table
+- [x] 1.8 Add profile_completed field to users table
+- [x] 1.9 Create migration for user profile fields
+- [x] 1.10 Update User model with new fields
+- [x] 1.11 Create UserProfileController with update endpoints
+- [x] 1.12 Add profile photo upload endpoint
+- [x] 1.13 Add profile completion endpoint
 
 ## Phase 2: Driver Verification System (12 fields)
-- [ ] 2.1 Create driver_verifications table migration
-- [ ] 2.2 Add dl_number field (driving license)
-- [ ] 2.3 Add dl_expiry_date field
-- [ ] 2.4 Add dl_front_image field (file storage)
-- [ ] 2.5 Add dl_back_image field (file storage)
-- [ ] 2.6 Add rc_number field (registration certificate)
-- [ ] 2.7 Add rc_front_image field (file storage)
-- [ ] 2.8 Add rc_back_image field (file storage)
-- [ ] 2.9 Add verification_status field (enum: pending, approved, rejected)
-- [ ] 2.10 Create DriverVerification model
-- [ ] 2.11 Create DriverVerificationController
-- [ ] 2.12 Add KYC status endpoint
+- [x] 2.1 Create driver_verifications table migration
+- [x] 2.2 Add dl_number field (driving license)
+- [x] 2.3 Add dl_expiry_date field
+- [x] 2.4 Add dl_front_image field (file storage)
+- [x] 2.5 Add dl_back_image field (file storage)
+- [x] 2.6 Add rc_number field (registration certificate)
+- [x] 2.7 Add rc_front_image field (file storage)
+- [x] 2.8 Add rc_back_image field (file storage)
+- [x] 2.9 Add verification_status field (enum: pending, approved, rejected)
+- [x] 2.10 Create DriverVerification model
+- [x] 2.11 Create DriverVerificationController
+- [x] 2.12 Add KYC status endpoint
 
 ## Phase 3: Vehicle Management (8 fields)
-- [ ] 3.1 Create vehicles table migration
-- [ ] 3.2 Add vehicle_name field
-- [ ] 3.3 Add vehicle_type field (enum: sedan, suv, hatchback, muv, compact_suv)
-- [ ] 3.4 Add license_plate field (unique)
-- [ ] 3.5 Add vehicle_color field
-- [ ] 3.6 Add vehicle_year field
-- [ ] 3.7 Add seating_capacity field (auto-determined by type)
-- [ ] 3.8 Add vehicle_photo field (file storage)
-- [ ] 3.9 Create Vehicle model with relationships
-- [ ] 3.10 Create VehicleController (CRUD operations)
-- [ ] 3.11 Add vehicle list endpoint
-- [ ] 3.12 Add set default vehicle endpoint
+- [x] 3.1 Create vehicles table migration
+- [x] 3.2 Add vehicle_name field
+- [x] 3.3 Add vehicle_type field (enum: sedan, suv, hatchback, muv, compact_suv)
+- [x] 3.4 Add license_plate field (unique)
+- [x] 3.5 Add vehicle_color field
+- [x] 3.6 Add vehicle_year field
+- [x] 3.7 Add seating_capacity field (auto-determined by type)
+- [x] 3.8 Add vehicle_photo field (file storage)
+- [x] 3.9 Create Vehicle model with relationships
+- [x] 3.10 Create VehicleController (CRUD operations)
+- [x] 3.11 Add vehicle list endpoint
+- [x] 3.12 Add set default vehicle endpoint
 
 ## Phase 4: Bookings System (10 fields)
-- [ ] 4.1 Create bookings table migration
-- [ ] 4.2 Add ride_id foreign key
-- [ ] 4.3 Add passenger_id foreign key
-- [ ] 4.4 Add seats_booked field
-- [ ] 4.5 Add passenger_name field
-- [ ] 4.6 Add passenger_phone field
-- [ ] 4.7 Add special_instructions field
-- [ ] 4.8 Add luggage_info field
-- [ ] 4.9 Add accessibility_requirements field
-- [ ] 4.10 Add booking_status field (enum: pending, confirmed, completed, cancelled)
-- [ ] 4.11 Create Booking model
-- [ ] 4.12 Create BookingController
-- [ ] 4.13 Add create booking endpoint
-- [ ] 4.14 Add cancel booking endpoint
-- [ ] 4.15 Add booking history endpoint
+- [x] 4.1 Create bookings table migration
+- [x] 4.2 Add ride_id foreign key
+- [x] 4.3 Add passenger_id foreign key
+- [x] 4.4 Add seats_booked field
+- [x] 4.5 Add passenger_name field
+- [x] 4.6 Add passenger_phone field
+- [x] 4.7 Add special_instructions field
+- [x] 4.8 Add luggage_info field
+- [x] 4.9 Add accessibility_requirements field
+- [x] 4.10 Add booking_status field (enum: pending, confirmed, completed, cancelled)
+- [x] 4.11 Create Booking model
+- [x] 4.12 Create BookingController
+- [x] 4.13 Add create booking endpoint
+- [x] 4.14 Add cancel booking endpoint
+- [x] 4.15 Add booking history endpoint
 
 ## Phase 5: Ratings & Reviews System (8 fields)
-- [ ] 5.1 Create reviews table migration
-- [ ] 5.2 Add ride_id foreign key
-- [ ] 5.3 Add reviewer_id foreign key
-- [ ] 5.4 Add reviewee_id foreign key
-- [ ] 5.5 Add rating field (1-5 integer)
-- [ ] 5.6 Add comment field (max 500 chars)
-- [ ] 5.7 Add categories field (JSON for category ratings)
-- [ ] 5.8 Add photos field (JSON array for review photos)
-- [ ] 5.9 Create Review model
-- [ ] 5.10 Create ReviewController
-- [ ] 5.11 Add rate driver endpoint
-- [ ] 5.12 Add rate passenger endpoint
-- [ ] 5.13 Add get reviews endpoint
+- [x] 5.1 Create reviews table migration
+- [x] 5.2 Add ride_id foreign key
+- [x] 5.3 Add reviewer_id foreign key
+- [x] 5.4 Add reviewee_id foreign key
+- [x] 5.5 Add rating field (1-5 integer)
+- [x] 5.6 Add comment field (max 500 chars)
+- [x] 5.7 Add categories field (JSON for category ratings)
+- [x] 5.8 Add photos field (JSON array for review photos)
+- [x] 5.9 Create Review model
+- [x] 5.10 Create ReviewController
+- [x] 5.11 Add rate driver endpoint
+- [x] 5.12 Add rate passenger endpoint
+- [x] 5.13 Add get reviews endpoint
 
 ## Phase 6: Chat & Messaging System (6 fields)
-- [ ] 6.1 Create chats table migration
-- [ ] 6.2 Create chat_participants table migration
-- [ ] 6.3 Create messages table migration
-- [ ] 6.4 Add message_type field (enum: text, image, location)
-- [ ] 6.5 Add attachment field (file storage)
-- [ ] 6.6 Add metadata field (JSON)
-- [ ] 6.7 Create Chat model
-- [ ] 6.8 Create Message model
-- [ ] 6.9 Create ChatController
-- [ ] 6.10 Add send message endpoint
-- [ ] 6.11 Add get messages endpoint
-- [ ] 6.12 Add mark as read endpoint
+- [x] 6.1 Create chats table migration
+- [x] 6.2 Create chat_participants table migration
+- [x] 6.3 Create messages table migration
+- [x] 6.4 Add message_type field (enum: text, image, location)
+- [x] 6.5 Add attachment field (file storage)
+- [x] 6.6 Add metadata field (JSON)
+- [x] 6.7 Create Chat model
+- [x] 6.8 Create Message model
+- [x] 6.9 Create ChatController
+- [x] 6.10 Add send message endpoint
+- [x] 6.11 Add get messages endpoint
+- [x] 6.12 Add mark as read endpoint
 
 ## Phase 7: Saved Routes & Recent Routes (5 fields)
-- [ ] 7.1 Create saved_routes table migration
-- [ ] 7.2 Add from_location field
-- [ ] 7.3 Add to_location field
-- [ ] 7.4 Add is_pinned field
-- [ ] 7.5 Add last_used_at field
-- [ ] 7.6 Create SavedRoute model
-- [ ] 7.7 Create SavedRouteController
-- [ ] 7.8 Add save route endpoint
-- [ ] 7.9 Add get recent routes endpoint
-- [ ] 7.10 Add update route endpoint
-- [ ] 7.11 Add delete route endpoint
+- [x] 7.1 Create saved_routes table migration
+- [x] 7.2 Add from_location field
+- [x] 7.3 Add to_location field
+- [x] 7.4 Add is_pinned field
+- [x] 7.5 Add last_used_at field
+- [x] 7.6 Create SavedRoute model
+- [x] 7.7 Create SavedRouteController
+- [x] 7.8 Add save route endpoint
+- [x] 7.9 Add get recent routes endpoint
+- [x] 7.10 Add update route endpoint
+- [x] 7.11 Add delete route endpoint
 
 ## Phase 8: Notifications & FCM (5 fields)
-- [ ] 8.1 Create fcm_tokens table migration
-- [ ] 8.2 Add fcm_token field
-- [ ] 8.3 Add device_type field (enum: android, ios)
-- [ ] 8.4 Add device_id field
-- [ ] 8.5 Add device_name field
-- [ ] 8.6 Create notification_preferences table
-- [ ] 8.7 Create FcmToken model
-- [ ] 8.8 Create NotificationController
-- [ ] 8.9 Add register FCM token endpoint
-- [ ] 8.10 Add update notification preferences endpoint
+- [x] 8.1 Create fcm_tokens table migration
+- [x] 8.2 Add fcm_token field
+- [x] 8.3 Add device_type field (enum: android, ios)
+- [x] 8.4 Add device_id field
+- [x] 8.5 Add device_name field
+- [x] 8.6 Create notification_preferences table
+- [x] 8.7 Create FcmToken model
+- [x] 8.8 Create NotificationController
+- [x] 8.9 Add register FCM token endpoint
+- [x] 8.10 Add update notification preferences endpoint
 
 ## Phase 9: Real-time Location Tracking (9 fields)
-- [ ] 9.1 Create ride_locations table migration
-- [ ] 9.2 Add ride_id foreign key
-- [ ] 9.3 Add latitude field
-- [ ] 9.4 Add longitude field
-- [ ] 9.5 Add accuracy field
-- [ ] 9.6 Add speed field
-- [ ] 9.7 Add heading field
-- [ ] 9.8 Add altitude field
-- [ ] 9.9 Add timestamp field
-- [ ] 9.10 Create RideLocation model
-- [ ] 9.11 Create LocationController
-- [ ] 9.12 Add update location endpoint
-- [ ] 9.13 Add get location history endpoint
+- [x] 9.1 Create ride_locations table migration
+- [x] 9.2 Add ride_id foreign key
+- [x] 9.3 Add latitude field
+- [x] 9.4 Add longitude field
+- [x] 9.5 Add accuracy field
+- [x] 9.6 Add speed field
+- [x] 9.7 Add heading field
+- [x] 9.8 Add altitude field
+- [x] 9.9 Add timestamp field
+- [x] 9.10 Create RideLocation model
+- [x] 9.11 Create LocationController
+- [x] 9.12 Add update location endpoint
+- [x] 9.13 Add get location history endpoint
 
 ## Phase 10: Payment Methods (5 fields)
 - [ ] 10.1 Create payment_methods table migration
