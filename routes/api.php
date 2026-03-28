@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\ChatController;
 use App\Http\Controllers\Api\V1\SavedRouteController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\LocationController;
+use App\Http\Controllers\Api\V1\PaymentController;
 
 Route::prefix('v1')->group(function () {
     // Public health check (no auth required)
@@ -110,6 +111,13 @@ Route::prefix('v1')->group(function () {
         Route::post('/locations/update', [LocationController::class, 'updateLocation']);
         Route::get('/locations/history/{rideId}', [LocationController::class, 'getLocationHistory']);
         Route::get('/locations/current/{rideId}', [LocationController::class, 'getCurrentLocation']);
+
+        // Payment Method endpoints
+        Route::post('/payment-methods', [PaymentController::class, 'addPaymentMethod']);
+        Route::get('/payment-methods', [PaymentController::class, 'getPaymentMethods']);
+        Route::put('/payment-methods/{paymentMethod}', [PaymentController::class, 'updatePaymentMethod']);
+        Route::delete('/payment-methods/{paymentMethod}', [PaymentController::class, 'deletePaymentMethod']);
+        Route::post('/payment-methods/{paymentMethod}/set-default', [PaymentController::class, 'setDefaultPaymentMethod']);
 
         // Driver routes
         Route::middleware(\App\Http\Middleware\CheckDriverRole::class)->group(function () {

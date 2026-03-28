@@ -1466,3 +1466,326 @@ The `message_type` field supports the following types:
 - Notification preferences are user-specific and encrypted
 - Location data is only accessible to ride participants (driver and rider)
 - Location history is indexed by ride_id and timestamp for efficient queries
+
+
+## Payment Methods Endpoints
+
+### 35. Add Payment Method
+**POST** `/api/v1/payment-methods`
+
+**Request Body:**
+```json
+{
+  "payment_type": "card",
+  "payment_details": {
+    "card_number": "****1234",
+    "expiry": "12/25",
+    "holder_name": "John Doe"
+  },
+  "is_default": false
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Payment method added successfully",
+  "payment_method": {
+    "id": 1,
+    "user_id": 1,
+    "payment_type": "card",
+    "payment_details": {
+      "card_number": "****1234",
+      "expiry": "12/25",
+      "holder_name": "John Doe"
+    },
+    "is_default": true,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+**Error (401) - Unauthorized:**
+```json
+{
+  "success": false,
+  "error": "User not authenticated"
+}
+```
+
+**Error (422) - Validation error:**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "errors": {
+    "payment_type": ["The payment type must be one of: card, wallet, upi"],
+    "payment_details": ["The payment details field is required"]
+  }
+}
+```
+
+### Payment Method Details
+- **Purpose**: Add a new payment method for the authenticated user
+- **Authentication**: Required (Sanctum token)
+- **Payment Types**: `card`, `wallet`, `upi`
+- **Default Behavior**: First payment method is automatically set as default
+- **Encryption**: Payment details are encrypted in the database
+- **is_default**: If true, other payment methods are automatically unset as default
+
+---
+
+### 36. Get Payment Methods
+**GET** `/api/v1/payment-methods`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Payment methods retrieved successfully",
+  "payment_methods": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "payment_type": "card",
+      "payment_details": {
+        "card_number": "****1234",
+        "expiry": "12/25",
+        "holder_name": "John Doe"
+      },
+      "is_default": true,
+      "is_active": true,
+      "created_at": "2024-01-01T00:00:00Z",
+      "updated_at": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "payment_type": "upi",
+      "payment_details": {
+        "upi_id": "user@bank"
+      },
+      "is_default": false,
+      "is_active": true,
+      "created_at": "2024-01-01T00:01:00Z",
+      "updated_at": "2024-01-01T00:01:00Z"
+    }
+  ],
+  "count": 2
+}
+```
+
+**Error (401) - Unauthorized:**
+```json
+{
+  "success": false,
+  "error": "User not authenticated"
+}
+```
+
+### Payment Methods List Details
+- **Purpose**: Retrieve all active payment methods for the authenticated user
+- **Authentication**: Required (Sanctum token)
+- **Ordering**: Default payment methods first, then by creation date (newest first)
+- **Filtering**: Only active payment methods are returned
+- **Encryption**: Payment details are automatically decrypted when retrieved
+
+---
+
+### 37. Update Payment Method
+**PUT** `/api/v1/payment-methods/{id}`
+
+**Request Body:**
+```json
+{
+  "payment_type": "wallet",
+  "payment_details": {
+    "wallet_id": "wallet123"
+  },
+  "is_active": true
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Payment method updated successfully",
+  "payment_method": {
+    "id": 1,
+    "user_id": 1,
+    "payment_type": "wallet",
+    "payment_details": {
+      "wallet_id": "wallet123"
+    },
+    "is_default": true,
+    "is_active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:05:00Z"
+  }
+}
+```
+
+**Error (401) - Unauthorized:**
+```json
+{
+  "success": false,
+  "error": "User not authenticated"
+}
+```
+
+**Error (403) - Forbidden:**
+```json
+{
+  "success": false,
+  "error": "Unauthorized",
+  "message": "You do not have permission to update this payment method"
+}
+```
+
+**Error (422) - Validation error:**
+```json
+{
+  "success": false,
+  "error": "Validation failed",
+  "errors": {
+    "payment_type": ["The payment type must be one of: card, wallet, upi"]
+  }
+}
+```
+
+### Update Payment Method Details
+- **Purpose**: Update an existing payment method
+- **Authentication**: Required (Sanctum token)
+- **Authorization**: Only the owner of the payment method can update it
+- **Updatable Fields**: `payment_type`, `payment_details`, `is_active`
+- **Encryption**: Updated payment details are automatically encrypted
+
+---
+
+### 38. Delete Payment Method
+**DELETE** `/api/v1/payment-methods/{id}`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Payment method deleted successfully"
+}
+```
+
+**Error (401) - Unauthorized:**
+```json
+{
+  "success": false,
+  "error": "User not authenticated"
+}
+```
+
+**Error (403) - Forbidden:**
+```json
+{
+  "success": false,
+  "error": "Unauthorized",
+  "message": "You do not have permission to delete this payment method"
+}
+```
+
+**Error (404) - Not Found:**
+```json
+{
+  "success": false,
+  "error": "Payment method not found"
+}
+```
+
+### Delete Payment Method Details
+- **Purpose**: Delete a payment method for the authenticated user
+- **Authentication**: Required (Sanctum token)
+- **Authorization**: Only the owner of the payment method can delete it
+- **Default Handling**: If the deleted payment method was default, the most recently created payment method becomes the new default
+- **Soft Delete**: Payment methods are permanently deleted (not soft deleted)
+
+---
+
+### 39. Set Default Payment Method
+**POST** `/api/v1/payment-methods/{id}/set-default`
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Payment method set as default successfully",
+  "payment_method": {
+    "id": 2,
+    "user_id": 1,
+    "payment_type": "upi",
+    "payment_details": {
+      "upi_id": "user@bank"
+    },
+    "is_default": true,
+    "is_active": true,
+    "created_at": "2024-01-01T00:01:00Z",
+    "updated_at": "2024-01-01T00:10:00Z"
+  }
+}
+```
+
+**Error (401) - Unauthorized:**
+```json
+{
+  "success": false,
+  "error": "User not authenticated"
+}
+```
+
+**Error (403) - Forbidden:**
+```json
+{
+  "success": false,
+  "error": "Unauthorized",
+  "message": "You do not have permission to update this payment method"
+}
+```
+
+**Error (404) - Not Found:**
+```json
+{
+  "success": false,
+  "error": "Payment method not found"
+}
+```
+
+### Set Default Payment Method Details
+- **Purpose**: Set a payment method as the default for the authenticated user
+- **Authentication**: Required (Sanctum token)
+- **Authorization**: Only the owner of the payment method can set it as default
+- **Behavior**: All other payment methods for the user are automatically unset as default
+- **Response**: Returns the updated payment method with `is_default: true`
+
+---
+
+## Payment Methods Database Schema
+
+### payment_methods table
+- id (bigint, primary key)
+- user_id (bigint, foreign key to users)
+- payment_type (enum: card, wallet, upi)
+- payment_details (longtext, encrypted JSON)
+- is_default (boolean, default: false)
+- is_active (boolean, default: true)
+- created_at (timestamp)
+- updated_at (timestamp)
+
+### Indexes
+- user_id (for filtering by user)
+- is_default (for finding default payment method)
+
+### Encryption
+- payment_details field is encrypted using Laravel's encryption
+- Automatically decrypted when accessed through the model
+- Automatically encrypted when saved to the database
+

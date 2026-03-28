@@ -130,16 +130,16 @@
 - [x] 9.13 Add get location history endpoint
 
 ## Phase 10: Payment Methods (5 fields)
-- [ ] 10.1 Create payment_methods table migration
-- [ ] 10.2 Add user_id foreign key
-- [ ] 10.3 Add payment_type field (enum: card, wallet, upi)
-- [ ] 10.4 Add payment_details field (encrypted JSON)
-- [ ] 10.5 Add is_default field
-- [ ] 10.6 Create PaymentMethod model
-- [ ] 10.7 Create PaymentController
-- [ ] 10.8 Add add payment method endpoint
-- [ ] 10.9 Add get payment methods endpoint
-- [ ] 10.10 Add delete payment method endpoint
+- [x] 10.1 Create payment_methods table migration
+- [x] 10.2 Add user_id foreign key
+- [x] 10.3 Add payment_type field (enum: card, wallet, upi)
+- [x] 10.4 Add payment_details field (encrypted JSON)
+- [x] 10.5 Add is_default field
+- [x] 10.6 Create PaymentMethod model
+- [x] 10.7 Create PaymentController
+- [x] 10.8 Add add payment method endpoint
+- [x] 10.9 Add get payment methods endpoint
+- [x] 10.10 Add delete payment method endpoint
 
 ## Phase 11: Ride Offering (Driver Side) (14 fields)
 - [ ] 11.1 Extend Ride model for driver offerings
