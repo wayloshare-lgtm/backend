@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Auth\AuthenticationException;
 
 class Authenticate extends Middleware
 {
@@ -12,12 +13,12 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        // For API requests, always return null (no redirect, will return 401)
+        // For API requests, throw exception instead of redirecting
         if ($request->expectsJson() || $request->is('api/*')) {
-            return null;
+            throw new AuthenticationException('Unauthenticated');
         }
 
-        // For web requests, redirect to login (but login route doesn't exist, so return null)
+        // For web requests, return null (no login route defined)
         return null;
     }
 
@@ -26,14 +27,12 @@ class Authenticate extends Middleware
      */
     protected function unauthenticated($request, array $guards)
     {
+        // Always throw exception for API requests
         if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json([
-                'success' => false,
-                'error' => 'Unauthenticated',
-                'message' => 'User not authenticated',
-            ], 401);
+            throw new AuthenticationException('Unauthenticated', $guards);
         }
 
+        // For web requests, throw exception
         parent::unauthenticated($request, $guards);
     }
 }

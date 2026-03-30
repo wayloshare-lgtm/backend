@@ -83,14 +83,25 @@ class ReviewController extends Controller
                 ], 409);
             }
 
+            // Sanitize string fields
+            $comment = $request->comment ? strip_tags($request->comment) : null;
+            $categories = $request->categories;
+            if ($categories) {
+                foreach ($categories as &$category) {
+                    if (isset($category['name'])) {
+                        $category['name'] = strip_tags($category['name']);
+                    }
+                }
+            }
+
             // Create the review
             $review = Review::create([
                 'ride_id' => $ride->id,
                 'reviewer_id' => $user->id,
                 'reviewee_id' => $revieweeId,
                 'rating' => $request->rating,
-                'comment' => $request->comment,
-                'categories' => $request->categories,
+                'comment' => $comment,
+                'categories' => $categories,
                 'photos' => $request->photos,
             ]);
 
@@ -196,14 +207,25 @@ class ReviewController extends Controller
                 ], 409);
             }
 
+            // Sanitize string fields
+            $comment = $request->comment ? strip_tags($request->comment) : null;
+            $categories = $request->categories;
+            if ($categories) {
+                foreach ($categories as &$category) {
+                    if (isset($category['name'])) {
+                        $category['name'] = strip_tags($category['name']);
+                    }
+                }
+            }
+
             // Create the review
             $review = Review::create([
                 'ride_id' => $ride->id,
                 'reviewer_id' => $user->id,
                 'reviewee_id' => $revieweeId,
                 'rating' => $request->rating,
-                'comment' => $request->comment,
-                'categories' => $request->categories,
+                'comment' => $comment,
+                'categories' => $categories,
                 'photos' => $request->photos,
             ]);
 

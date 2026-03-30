@@ -31,6 +31,9 @@ class UserFactory extends Factory
             'role' => 'rider',
             'is_active' => true,
             'is_verified' => false,
+            'show_phone' => true,
+            'show_email' => false,
+            'allow_messages' => true,
         ];
     }
 

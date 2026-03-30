@@ -113,7 +113,7 @@ class DriverVerificationControllerTest extends TestCase
 
         $verification = DriverVerification::where('user_id', $user->id)->first();
         $this->assertNotNull($verification);
-        $this->assertEquals('pending', $verification->verification_status);
+        $this->assertEquals(\App\Enums\VerificationStatus::PENDING, $verification->verification_status);
     }
 
     /**
@@ -254,7 +254,7 @@ class DriverVerificationControllerTest extends TestCase
 
         $verification = DriverVerification::where('user_id', $user->id)->first();
         $this->assertNotNull($verification);
-        $this->assertEquals('pending', $verification->verification_status);
+        $this->assertEquals(\App\Enums\VerificationStatus::PENDING, $verification->verification_status);
     }
 
     /**

@@ -51,4 +51,19 @@ class Review extends Model
     {
         return $this->belongsTo(User::class, 'reviewee_id');
     }
+
+    /**
+     * Get validation rules for review creation
+     */
+    public static function rules(): array
+    {
+        return [
+            'ride_id' => 'required|exists:rides,id',
+            'reviewee_id' => 'required|exists:users,id',
+            'rating' => 'required|integer|min:1|max:5',
+            'comment' => 'nullable|string|max:500',
+            'categories' => 'nullable|json',
+            'photos' => 'nullable|json',
+        ];
+    }
 }

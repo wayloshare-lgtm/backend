@@ -30,10 +30,14 @@ class SavedRouteController extends Controller
                 'to_location' => 'required|string|max:255',
             ]);
 
+            // Sanitize string fields
+            $fromLocation = strip_tags($request->from_location);
+            $toLocation = strip_tags($request->to_location);
+
             $savedRoute = SavedRoute::create([
                 'user_id' => $user->id,
-                'from_location' => $request->from_location,
-                'to_location' => $request->to_location,
+                'from_location' => $fromLocation,
+                'to_location' => $toLocation,
                 'is_pinned' => false,
             ]);
 
@@ -212,10 +216,20 @@ class SavedRouteController extends Controller
                 'to_location' => 'nullable|string|max:255',
             ]);
 
-            $savedRoute->update($request->only([
+            $updateData = $request->only([
                 'from_location',
                 'to_location',
-            ]));
+            ]);
+
+            // Sanitize string fields
+            if (isset($updateData['from_location'])) {
+                $updateData['from_location'] = strip_tags($updateData['from_location']);
+            }
+            if (isset($updateData['to_location'])) {
+                $updateData['to_location'] = strip_tags($updateData['to_location']);
+            }
+
+            $savedRoute->update($updateData);
 
             return response()->json([
                 'success' => true,

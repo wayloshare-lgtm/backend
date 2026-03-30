@@ -13,12 +13,15 @@ class Ride extends Model
     protected $fillable = [
         'rider_id',
         'driver_id',
+        'vehicle_id',
         'pickup_location',
         'pickup_lat',
         'pickup_lng',
         'dropoff_location',
         'dropoff_lat',
         'dropoff_lng',
+        'departure_date',
+        'departure_time',
         'estimated_distance_km',
         'estimated_duration_minutes',
         'estimated_fare',
@@ -34,6 +37,14 @@ class Ride extends Model
         'started_at',
         'completed_at',
         'cancelled_at',
+        'available_seats',
+        'price_per_seat',
+        'description',
+        'preferences',
+        'ac_available',
+        'wifi_available',
+        'music_preference',
+        'smoking_allowed',
     ];
 
     protected $casts = [
@@ -41,6 +52,8 @@ class Ride extends Model
         'pickup_lng' => 'decimal:7',
         'dropoff_lat' => 'decimal:7',
         'dropoff_lng' => 'decimal:7',
+        'departure_date' => 'date',
+        'departure_time' => 'datetime:H:i:s',
         'estimated_distance_km' => 'decimal:2',
         'estimated_fare' => 'decimal:2',
         'actual_distance_km' => 'decimal:2',
@@ -52,6 +65,11 @@ class Ride extends Model
         'started_at' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
+        'price_per_seat' => 'decimal:2',
+        'preferences' => 'json',
+        'ac_available' => 'boolean',
+        'wifi_available' => 'boolean',
+        'smoking_allowed' => 'boolean',
     ];
 
     /**
@@ -71,6 +89,14 @@ class Ride extends Model
     }
 
     /**
+     * Get the vehicle used for this ride
+     */
+    public function vehicle(): BelongsTo
+    {
+        return $this->belongsTo(Vehicle::class, 'vehicle_id');
+    }
+
+    /**
      * Get the bookings for this ride
      */
     public function bookings()
@@ -84,5 +110,13 @@ class Ride extends Model
     public function locations()
     {
         return $this->hasMany(RideLocation::class);
+    }
+
+    /**
+     * Get the chats for this ride
+     */
+    public function chats()
+    {
+        return $this->hasMany(Chat::class);
     }
 }

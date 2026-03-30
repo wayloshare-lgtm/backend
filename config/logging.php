@@ -127,6 +127,22 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'requests' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/requests.log'),
+            'level' => env('LOG_REQUESTS_LEVEL', 'info'),
+            'days' => env('LOG_REQUESTS_DAYS', 30),
+            'replace_placeholders' => true,
+        ],
+
+        'queries' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/queries.log'),
+            'level' => env('LOG_QUERIES_LEVEL', 'warning'),
+            'days' => env('LOG_QUERIES_DAYS', 30),
+            'replace_placeholders' => true,
+        ],
+
     ],
 
 ];

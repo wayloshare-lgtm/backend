@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\DriverProfile;
+use App\Rules\IndianPhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -66,6 +67,7 @@ class DriverController extends Controller
                 'vehicle_number' => 'required|string|unique:driver_profiles,vehicle_number',
                 'current_lat' => 'nullable|numeric|between:-90,90',
                 'current_lng' => 'nullable|numeric|between:-180,180',
+                'emergency_contact' => ['nullable', new IndianPhoneNumber()],
             ]);
 
             $user = auth()->user();
@@ -81,6 +83,7 @@ class DriverController extends Controller
                     'vehicle_number' => $request->vehicle_number,
                     'current_lat' => $request->current_lat,
                     'current_lng' => $request->current_lng,
+                    'emergency_contact' => $request->emergency_contact,
                 ]);
 
                 $statusCode = 200;
@@ -94,6 +97,7 @@ class DriverController extends Controller
                     'vehicle_number' => $request->vehicle_number,
                     'current_lat' => $request->current_lat,
                     'current_lng' => $request->current_lng,
+                    'emergency_contact' => $request->emergency_contact,
                 ]);
 
                 $statusCode = 201;

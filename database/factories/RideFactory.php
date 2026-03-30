@@ -20,12 +20,15 @@ class RideFactory extends Factory
         return [
             'rider_id' => User::factory(),
             'driver_id' => User::factory()->driver(),
+            'vehicle_id' => null,
             'pickup_location' => fake()->address(),
             'pickup_lat' => fake()->latitude(),
             'pickup_lng' => fake()->longitude(),
             'dropoff_location' => fake()->address(),
             'dropoff_lat' => fake()->latitude(),
             'dropoff_lng' => fake()->longitude(),
+            'departure_date' => fake()->dateTimeBetween('+1 day', '+30 days')->format('Y-m-d'),
+            'departure_time' => fake()->time('H:i:s'),
             'estimated_distance_km' => fake()->randomFloat(2, 1, 50),
             'estimated_duration_minutes' => fake()->numberBetween(5, 120),
             'estimated_fare' => fake()->randomFloat(2, 50, 500),
@@ -41,6 +44,14 @@ class RideFactory extends Factory
             'started_at' => null,
             'completed_at' => null,
             'cancelled_at' => null,
+            'available_seats' => fake()->numberBetween(1, 4),
+            'price_per_seat' => fake()->randomFloat(2, 50, 300),
+            'description' => fake()->sentence(),
+            'preferences' => null,
+            'ac_available' => fake()->boolean(),
+            'wifi_available' => fake()->boolean(),
+            'music_preference' => fake()->randomElement(['pop', 'rock', 'classical', 'none']),
+            'smoking_allowed' => fake()->boolean(),
         ];
     }
 

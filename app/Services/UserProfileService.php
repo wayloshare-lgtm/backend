@@ -17,7 +17,7 @@ class UserProfileService
         $cacheKey = $this->getCacheKey($user->id);
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($user) {
-            return [
+            $profile = [
                 'id' => $user->id,
                 'firebase_uid' => $user->firebase_uid,
                 'name' => $user->name,
@@ -42,6 +42,18 @@ class UserProfileService
                 'theme' => $user->theme,
                 'created_at' => $user->created_at,
             ];
+
+            // Include driver profile fields if user is a driver
+            if ($user->role === 'driver' && $user->driverProfile) {
+                $profile['driver_profile'] = [
+                    'languages_spoken' => $user->driverProfile->languages_spoken,
+                    'emergency_contact' => $user->driverProfile->emergency_contact,
+                    'insurance_provider' => $user->driverProfile->insurance_provider,
+                    'insurance_policy_number' => $user->driverProfile->insurance_policy_number,
+                ];
+            }
+
+            return $profile;
         });
     }
 

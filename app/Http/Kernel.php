@@ -19,6 +19,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \App\Http\Middleware\LogRequests::class,
     ];
 
     /**
@@ -40,6 +41,7 @@ class Kernel extends HttpKernel
             \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \App\Http\Middleware\SanitizeInput::class,
         ],
     ];
 
@@ -62,5 +64,6 @@ class Kernel extends HttpKernel
         'firebase.auth' => \App\Http\Middleware\VerifyFirebaseToken::class,
         'check.driver' => \App\Http\Middleware\CheckDriverRole::class,
         'check.admin' => \App\Http\Middleware\CheckAdminRole::class,
+        'sanitize' => \App\Http\Middleware\SanitizeInput::class,
     ];
 }

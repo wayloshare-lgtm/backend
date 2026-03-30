@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Ride;
+use App\Rules\IndianPhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -21,7 +22,7 @@ class BookingController extends Controller
                 'ride_id' => 'required|exists:rides,id',
                 'seats_booked' => 'required|integer|min:1|max:8',
                 'passenger_name' => 'required|string|max:255',
-                'passenger_phone' => 'required|string|max:20',
+                'passenger_phone' => ['required', new IndianPhoneNumber()],
                 'special_instructions' => 'nullable|string|max:1000',
                 'luggage_info' => 'nullable|string|max:1000',
                 'accessibility_requirements' => 'nullable|string|max:1000',
@@ -50,16 +51,32 @@ class BookingController extends Controller
                 ], 409);
             }
 
+            // Sanitize string fields using $request->input() for nullable fields
+            $specialInstructions = $request->input('special_instructions');
+            if ($specialInstructions) {
+                $specialInstructions = strip_tags($specialInstructions);
+            }
+            
+            $luggageInfo = $request->input('luggage_info');
+            if ($luggageInfo) {
+                $luggageInfo = strip_tags($luggageInfo);
+            }
+            
+            $accessibilityRequirements = $request->input('accessibility_requirements');
+            if ($accessibilityRequirements) {
+                $accessibilityRequirements = strip_tags($accessibilityRequirements);
+            }
+
             // Create the booking
             $booking = Booking::create([
-                'ride_id' => $ride->id,
+                'ride_id' => $request->ride_id,
                 'passenger_id' => $user->id,
                 'seats_booked' => $request->seats_booked,
                 'passenger_name' => $request->passenger_name,
                 'passenger_phone' => $request->passenger_phone,
-                'special_instructions' => $request->special_instructions,
-                'luggage_info' => $request->luggage_info,
-                'accessibility_requirements' => $request->accessibility_requirements,
+                'special_instructions' => $specialInstructions,
+                'luggage_info' => $luggageInfo,
+                'accessibility_requirements' => $accessibilityRequirements,
                 'booking_status' => 'pending',
             ]);
 

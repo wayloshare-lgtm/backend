@@ -20,6 +20,7 @@ class DriverVerification extends Model
         'dl_front_image',
         'dl_back_image',
         'rc_number',
+        'rc_expiry_date',
         'rc_front_image',
         'rc_back_image',
         'verification_status',
@@ -31,6 +32,7 @@ class DriverVerification extends Model
     {
         return [
             'dl_expiry_date' => 'date',
+            'rc_expiry_date' => 'date',
             'verified_at' => 'datetime',
             'verification_status' => VerificationStatus::class,
             'created_at' => 'datetime',

@@ -263,6 +263,96 @@ class RideService
     }
 
     /**
+     * Offer a ride (driver offering a ride)
+     */
+    public function offerRide(
+        User $driver,
+        string $pickupLocation,
+        float $pickupLat,
+        float $pickupLng,
+        string $dropoffLocation,
+        float $dropoffLat,
+        float $dropoffLng,
+        float $estimatedDistanceKm,
+        int $estimatedDurationMinutes,
+        int $availableSeats,
+        float $pricePerSeat,
+        ?string $description = null,
+        ?array $preferences = null,
+        bool $acAvailable = false,
+        bool $wifiAvailable = false,
+        ?string $musicPreference = null,
+        bool $smokingAllowed = false,
+        float $tollAmount = 0,
+        ?string $city = null
+    ): Ride
+    {
+        return DB::transaction(function () use (
+            $driver,
+            $pickupLocation,
+            $pickupLat,
+            $pickupLng,
+            $dropoffLocation,
+            $dropoffLat,
+            $dropoffLng,
+            $estimatedDistanceKm,
+            $estimatedDurationMinutes,
+            $availableSeats,
+            $pricePerSeat,
+            $description,
+            $preferences,
+            $acAvailable,
+            $wifiAvailable,
+            $musicPreference,
+            $smokingAllowed,
+            $tollAmount,
+            $city
+        ) {
+            // Calculate estimated fare
+            $this->fareCalculator = new FareCalculatorService($city);
+            $fareBreakdown = $this->fareCalculator->calculate(
+                $estimatedDistanceKm,
+                $estimatedDurationMinutes,
+                $tollAmount
+            );
+
+            // Create ride with driver_id set (driver offering)
+            $ride = Ride::create([
+                'driver_id' => $driver->id,
+                'pickup_location' => $pickupLocation,
+                'pickup_lat' => $pickupLat,
+                'pickup_lng' => $pickupLng,
+                'dropoff_location' => $dropoffLocation,
+                'dropoff_lat' => $dropoffLat,
+                'dropoff_lng' => $dropoffLng,
+                'estimated_distance_km' => $estimatedDistanceKm,
+                'estimated_duration_minutes' => $estimatedDurationMinutes,
+                'estimated_fare' => $fareBreakdown['total_fare'],
+                'toll_amount' => $tollAmount,
+                'status' => 'offered',
+                'requested_at' => now(),
+                'available_seats' => $availableSeats,
+                'price_per_seat' => $pricePerSeat,
+                'description' => $description,
+                'preferences' => $preferences,
+                'ac_available' => $acAvailable,
+                'wifi_available' => $wifiAvailable,
+                'music_preference' => $musicPreference,
+                'smoking_allowed' => $smokingAllowed,
+            ]);
+
+            \Illuminate\Support\Facades\Log::info('Ride offered', [
+                'ride_id' => $ride->id,
+                'driver_id' => $driver->id,
+                'available_seats' => $availableSeats,
+                'price_per_seat' => $pricePerSeat,
+            ]);
+
+            return $ride;
+        });
+    }
+
+    /**
      * Get ride details
      */
     public function getRideDetails(Ride $ride): array
@@ -292,8 +382,74 @@ class RideService
             'started_at' => $ride->started_at,
             'completed_at' => $ride->completed_at,
             'cancelled_at' => $ride->cancelled_at,
+            'available_seats' => $ride->available_seats,
+            'price_per_seat' => $ride->price_per_seat ? (float) $ride->price_per_seat : null,
+            'description' => $ride->description,
+            'preferences' => $ride->preferences,
+            'ac_available' => (bool) $ride->ac_available,
+            'wifi_available' => (bool) $ride->wifi_available,
+            'music_preference' => $ride->music_preference,
+            'smoking_allowed' => (bool) $ride->smoking_allowed,
             'created_at' => $ride->created_at,
             'updated_at' => $ride->updated_at,
         ];
+    }
+
+    /**
+     * Update ride status generically
+     */
+    public function updateRideStatus(Ride $ride, string $newStatus): Ride
+    {
+        return DB::transaction(function () use ($ride, $newStatus) {
+            // Validate status transition
+            $this->statusValidator->validate($ride->status, $newStatus);
+
+            // Handle different status transitions
+            $updateData = [
+                'status' => $newStatus,
+                'updated_at' => now(),
+            ];
+
+            // Set appropriate timestamp and driver_id based on new status
+            switch ($newStatus) {
+                case 'accepted':
+                    $updateData['accepted_at'] = now();
+                    $updateData['driver_id'] = auth()->id();
+                    break;
+                case 'arrived':
+                    $updateData['arrived_at'] = now();
+                    break;
+                case 'started':
+                    $updateData['started_at'] = now();
+                    break;
+                case 'completed':
+                    $updateData['completed_at'] = now();
+                    break;
+                case 'cancelled':
+                    $updateData['cancelled_at'] = now();
+                    break;
+            }
+
+            // Safe update: only update if status matches current status
+            $rowsAffected = DB::table('rides')
+                ->where('id', $ride->id)
+                ->where('status', $ride->status)
+                ->update($updateData);
+
+            if ($rowsAffected === 0) {
+                throw new \App\Exceptions\InvalidRideTransitionException(
+                    'Ride status has changed. Cannot update ride.'
+                );
+            }
+
+            \Illuminate\Support\Facades\Log::info('Ride status updated', [
+                'ride_id' => $ride->id,
+                'old_status' => $ride->status,
+                'new_status' => $newStatus,
+                'user_id' => auth()->id(),
+            ]);
+
+            return $ride->refresh();
+        });
     }
 }

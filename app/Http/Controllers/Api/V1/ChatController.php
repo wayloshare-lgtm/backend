@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
 use App\Models\Chat;
 use App\Models\Message;
 use App\Services\FileUploadService;
@@ -22,17 +23,25 @@ class ChatController extends Controller
      */
     public function createChat(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'ride_id' => 'required|exists:rides,id',
-        ]);
+        try {
+            $validated = $request->validate([
+                'ride_id' => 'required|exists:rides,id',
+            ]);
 
-        $chat = Chat::create($validated);
+            $chat = Chat::create($validated);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Chat created successfully',
-            'data' => $chat,
-        ], 201);
+            return response()->json([
+                'success' => true,
+                'message' => 'Chat created successfully',
+                'data' => $chat,
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
+        }
     }
 
     /**
@@ -44,7 +53,7 @@ class ChatController extends Controller
 
         $chats = Chat::whereHas('ride', function ($query) use ($userId) {
             $query->where('driver_id', $userId)
-                  ->orWhere('passenger_id', $userId);
+                  ->orWhere('rider_id', $userId);
         })->with('ride', 'messages')->get();
 
         return response()->json([
@@ -58,45 +67,57 @@ class ChatController extends Controller
      */
     public function sendMessage(Request $request, Chat $chat): JsonResponse
     {
-        $validated = $request->validate([
-            'message' => 'nullable|string|max:1000',
-            'message_type' => 'required|in:text,image,location',
-            'attachment' => 'nullable|file|mimes:jpeg,png,pdf|max:10240',
-            'metadata' => 'nullable|json',
-        ]);
+        try {
+            $validated = $request->validate([
+                'message' => 'nullable|string|max:1000',
+                'message_type' => 'required|in:text,image,location',
+                'attachment' => 'nullable|file|mimes:jpeg,jpg,png,pdf|max:10240',
+                'metadata' => 'nullable|string',
+            ]);
 
-        $attachment = null;
+            $attachment = null;
 
-        // Handle file upload if provided
-        if ($request->hasFile('attachment')) {
-            try {
-                $attachment = $this->fileUploadService->upload(
-                    $request->file('attachment'),
-                    'messages'
-                );
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'FILE_UPLOAD_FAILED',
-                    'message' => $e->getMessage(),
-                ], 422);
+            // Handle file upload if provided
+            if ($request->hasFile('attachment')) {
+                try {
+                    $attachment = $this->fileUploadService->upload(
+                        $request->file('attachment'),
+                        'messages'
+                    );
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'success' => false,
+                        'error' => 'FILE_UPLOAD_FAILED',
+                        'message' => $e->getMessage(),
+                    ], 422);
+                }
             }
+
+            // Sanitize string fields using $request->input() for nullable fields
+            $message = $request->input('message') ? strip_tags($request->input('message')) : null;
+            $metadata = $request->input('metadata') ? strip_tags($request->input('metadata')) : null;
+
+            $message = Message::create([
+                'chat_id' => $chat->id,
+                'sender_id' => auth()->id(),
+                'message' => $message,
+                'message_type' => $validated['message_type'],
+                'attachment' => $attachment,
+                'metadata' => $metadata,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Message sent successfully',
+                'data' => $message,
+            ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Validation failed',
+                'errors' => $e->errors(),
+            ], 422);
         }
-
-        $message = Message::create([
-            'chat_id' => $chat->id,
-            'sender_id' => auth()->id(),
-            'message' => $validated['message'] ?? null,
-            'message_type' => $validated['message_type'],
-            'attachment' => $attachment,
-            'metadata' => $validated['metadata'] ?? null,
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Message sent successfully',
-            'data' => $message,
-        ], 201);
     }
 
     /**
@@ -116,6 +137,13 @@ class ChatController extends Controller
             $query->where('driver_id', $userId)
                   ->orWhere('rider_id', $userId);
         })->exists();
+
+        // If not a direct participant, check if they're a booking passenger
+        if (!$isParticipant) {
+            $isParticipant = $chat->ride->bookings()
+                ->where('passenger_id', $userId)
+                ->exists();
+        }
 
         if (!$isParticipant) {
             return response()->json([
@@ -179,7 +207,7 @@ class ChatController extends Controller
             'message' => 'Messages marked as read',
             'data' => [
                 'marked_count' => $markedCount,
-                'updated_at' => $now,
+                'updated_at' => true,
             ],
         ]);
     }

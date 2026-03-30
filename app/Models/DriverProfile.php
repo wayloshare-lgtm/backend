@@ -19,6 +19,11 @@ class DriverProfile extends Model
         'is_online',
         'current_lat',
         'current_lng',
+        'bio',
+        'languages_spoken',
+        'emergency_contact',
+        'insurance_provider',
+        'insurance_policy_number',
     ];
 
     protected $casts = [

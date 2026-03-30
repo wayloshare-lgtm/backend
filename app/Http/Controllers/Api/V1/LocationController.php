@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Ride;
 use App\Models\RideLocation;
+use App\Rules\Latitude;
+use App\Rules\Longitude;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -28,8 +30,8 @@ class LocationController extends Controller
 
             $request->validate([
                 'ride_id' => 'required|integer|exists:rides,id',
-                'latitude' => 'required|numeric|between:-90,90',
-                'longitude' => 'required|numeric|between:-180,180',
+                'latitude' => ['required', 'numeric', new Latitude()],
+                'longitude' => ['required', 'numeric', new Longitude()],
                 'accuracy' => 'nullable|numeric|min:0',
                 'speed' => 'nullable|numeric|min:0',
                 'heading' => 'nullable|numeric|between:0,360',

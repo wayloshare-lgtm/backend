@@ -1,0 +1,445 @@
+{
+  "info": {
+    "name": "WayloShare Backend API - Flutter Alignment",
+    "description": "Complete API testing collection for WayloShare ride-sharing backend with 40+ new endpoints for Flutter app alignment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Health Check",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/health",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "health"]
+            },
+            "description": "Check backend health - DB, Redis, Queue connections"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Authentication",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('sanctum_token', jsonData.token);",
+                  "    pm.environment.set('user_id', jsonData.user.id);",
+                  "    console.log('✓ Token saved: ' + jsonData.token);",
+                  "    console.log('✓ User ID saved: ' + jsonData.user.id);",
+                  "} else {",
+                  "    console.log('✗ Login failed');",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{firebase_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/login",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "login"]
+            },
+            "description": "Login with Firebase token - returns Sanctum API token. Token is automatically saved to environment."
+          },
+          "response": []
+        },
+        {
+          "name": "GET /auth/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/me",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "me"]
+            },
+            "description": "Get current user profile"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": ""
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/logout",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "auth", "logout"]
+            },
+            "description": "Logout and revoke all tokens"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. User Profile",
+      "item": [
+        {
+          "name": "GET /user/profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/profile",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "profile"]
+            },
+            "description": "Get user profile with all fields"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /user/profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"John Doe\",\n  \"date_of_birth\": \"1990-01-15\",\n  \"gender\": \"male\",\n  \"bio\": \"Friendly driver with 5 years experience\",\n  \"user_preference\": \"both\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/profile",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "profile"]
+            },
+            "description": "Update user profile"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /user/profile/photo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profile_photo",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/profile/photo",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "profile", "photo"]
+            },
+            "description": "Upload profile photo"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /user/complete-onboarding",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/complete-onboarding",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "complete-onboarding"]
+            },
+            "description": "Mark onboarding as completed"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /user/preferences",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/preferences",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "preferences"]
+            },
+            "description": "Get user preferences"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /user/preferences",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"language\": \"english\",\n  \"theme\": \"dark\",\n  \"allow_messages\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/preferences",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "preferences"]
+            },
+            "description": "Update user preferences"
+          },
+          "response": []
+        },
+        {
+          "name": "GET /user/privacy",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/privacy",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "privacy"]
+            },
+            "description": "Get privacy settings"
+          },
+          "response": []
+        },
+        {
+          "name": "POST /user/privacy",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{sanctum_token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profile_visibility\": \"public\",\n  \"show_phone\": true,\n  \"show_email\": false,\n  \"allow_messages\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/privacy",
+              "protocol": "http",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "privacy"]
+            },
+            "description": "Update privacy settings"
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000",
+      "type": "string"
+    },
+    {
+      "key": "firebase_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "sanctum_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ride_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "vehicle_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "booking_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "review_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chat_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "saved_route_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payment_method_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
+

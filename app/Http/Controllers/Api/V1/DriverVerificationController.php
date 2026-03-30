@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\DriverVerification;
 use App\Services\FileUploadService;
+use App\Rules\FutureDate;
+use App\Rules\FileUpload;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
@@ -35,8 +37,9 @@ class DriverVerificationController extends Controller
 
             $request->validate([
                 'dl_number' => 'nullable|string|max:255',
-                'dl_expiry_date' => 'nullable|date|after:today',
+                'dl_expiry_date' => ['nullable', 'date', new FutureDate()],
                 'rc_number' => 'nullable|string|max:255',
+                'rc_expiry_date' => ['nullable', 'date', new FutureDate()],
             ]);
 
             // Get or create verification record
@@ -46,7 +49,7 @@ class DriverVerificationController extends Controller
             );
 
             // Update with provided data
-            $updateData = $request->only(['dl_number', 'dl_expiry_date', 'rc_number']);
+            $updateData = $request->only(['dl_number', 'dl_expiry_date', 'rc_number', 'rc_expiry_date']);
             $updateData = array_filter($updateData, fn($value) => $value !== null);
 
             if (!empty($updateData)) {
@@ -132,20 +135,10 @@ class DriverVerificationController extends Controller
             }
 
             $request->validate([
-                'dl_front_image' => 'required|file|mimes:jpeg,png,pdf|max:10240',
+                'dl_front_image' => ['required', 'file', new FileUpload()],
             ]);
 
             $file = $request->file('dl_front_image');
-
-            // Validate file
-            $validationErrors = $this->fileUploadService->validate($file);
-            if (!empty($validationErrors)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'File validation failed',
-                    'errors' => $validationErrors,
-                ], 422);
-            }
 
             // Get or create verification record
             $verification = DriverVerification::firstOrCreate(
@@ -211,20 +204,10 @@ class DriverVerificationController extends Controller
             }
 
             $request->validate([
-                'dl_back_image' => 'required|file|mimes:jpeg,png,pdf|max:10240',
+                'dl_back_image' => ['required', 'file', new FileUpload()],
             ]);
 
             $file = $request->file('dl_back_image');
-
-            // Validate file
-            $validationErrors = $this->fileUploadService->validate($file);
-            if (!empty($validationErrors)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'File validation failed',
-                    'errors' => $validationErrors,
-                ], 422);
-            }
 
             // Get or create verification record
             $verification = DriverVerification::firstOrCreate(
@@ -290,20 +273,10 @@ class DriverVerificationController extends Controller
             }
 
             $request->validate([
-                'rc_front_image' => 'required|file|mimes:jpeg,png,pdf|max:10240',
+                'rc_front_image' => ['required', 'file', new FileUpload()],
             ]);
 
             $file = $request->file('rc_front_image');
-
-            // Validate file
-            $validationErrors = $this->fileUploadService->validate($file);
-            if (!empty($validationErrors)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'File validation failed',
-                    'errors' => $validationErrors,
-                ], 422);
-            }
 
             // Get or create verification record
             $verification = DriverVerification::firstOrCreate(
@@ -369,20 +342,10 @@ class DriverVerificationController extends Controller
             }
 
             $request->validate([
-                'rc_back_image' => 'required|file|mimes:jpeg,png,pdf|max:10240',
+                'rc_back_image' => ['required', 'file', new FileUpload()],
             ]);
 
             $file = $request->file('rc_back_image');
-
-            // Validate file
-            $validationErrors = $this->fileUploadService->validate($file);
-            if (!empty($validationErrors)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'File validation failed',
-                    'errors' => $validationErrors,
-                ], 422);
-            }
 
             // Get or create verification record
             $verification = DriverVerification::firstOrCreate(
@@ -504,7 +467,7 @@ class DriverVerificationController extends Controller
             }
 
             // Validate that all required documents are uploaded
-            $requiredDocuments = ['dl_number', 'dl_expiry_date', 'dl_front_image', 'dl_back_image', 'rc_number', 'rc_front_image', 'rc_back_image'];
+            $requiredDocuments = ['dl_number', 'dl_expiry_date', 'dl_front_image', 'dl_back_image', 'rc_number', 'rc_expiry_date', 'rc_front_image', 'rc_back_image'];
             $missingDocuments = [];
 
             foreach ($requiredDocuments as $doc) {
@@ -581,6 +544,7 @@ class DriverVerificationController extends Controller
                     'dl_number' => !empty($verification->dl_number),
                     'dl_expiry_date' => !empty($verification->dl_expiry_date),
                     'rc_number' => !empty($verification->rc_number),
+                    'rc_expiry_date' => !empty($verification->rc_expiry_date),
                 ],
             ];
 
@@ -611,6 +575,7 @@ class DriverVerificationController extends Controller
             'dl_front_image' => $verification->dl_front_image ? $this->fileUploadService->getUrl($verification->dl_front_image) : null,
             'dl_back_image' => $verification->dl_back_image ? $this->fileUploadService->getUrl($verification->dl_back_image) : null,
             'rc_number' => $verification->rc_number,
+            'rc_expiry_date' => $verification->rc_expiry_date,
             'rc_front_image' => $verification->rc_front_image ? $this->fileUploadService->getUrl($verification->rc_front_image) : null,
             'rc_back_image' => $verification->rc_back_image ? $this->fileUploadService->getUrl($verification->rc_back_image) : null,
             'verification_status' => $verification->verification_status,

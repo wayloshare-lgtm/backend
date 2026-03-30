@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Models\Vehicle;
 use App\Services\FileUploadService;
+use App\Rules\FileUpload;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -40,9 +41,10 @@ class VehicleController extends Controller
                 'vehicle_color' => 'nullable|string|max:255',
                 'vehicle_year' => 'nullable|integer|min:1900|max:' . date('Y'),
                 'seating_capacity' => 'nullable|integer|min:1|max:8',
+                'vehicle_photo' => ['nullable', 'file', new FileUpload()],
             ]);
 
-            $vehicle = Vehicle::create([
+            $vehicleData = [
                 'user_id' => $user->id,
                 'vehicle_name' => $request->vehicle_name,
                 'vehicle_type' => $request->vehicle_type,
@@ -51,7 +53,15 @@ class VehicleController extends Controller
                 'vehicle_year' => $request->vehicle_year,
                 'seating_capacity' => $request->seating_capacity,
                 'is_active' => true,
-            ]);
+            ];
+
+            // Handle vehicle photo upload
+            if ($request->hasFile('vehicle_photo')) {
+                $filePath = $this->fileUploadService->upload($request->file('vehicle_photo'), 'vehicle-photos');
+                $vehicleData['vehicle_photo'] = $filePath;
+            }
+
+            $vehicle = Vehicle::create($vehicleData);
 
             return response()->json([
                 'success' => true,
@@ -101,20 +111,10 @@ class VehicleController extends Controller
             }
 
             $request->validate([
-                'vehicle_photo' => 'required|file|mimes:jpeg,png,pdf|max:10240',
+                'vehicle_photo' => ['required', 'file', new FileUpload()],
             ]);
 
             $file = $request->file('vehicle_photo');
-
-            // Validate file
-            $validationErrors = $this->fileUploadService->validate($file);
-            if (!empty($validationErrors)) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'File validation failed',
-                    'errors' => $validationErrors,
-                ], 422);
-            }
 
             // Delete old photo if exists
             if ($vehicle->vehicle_photo) {
